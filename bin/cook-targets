@@ -1,0 +1,16 @@
+#!/bin/bash
+
+print_targets()
+{
+	CWD=`pwd`
+	cd $COOK_PROJECT/feature/bsp
+	TARGETS=`ls -1`
+	for TARGET in $TARGETS; do
+		echo $TARGET
+	done
+	cd $CWD
+}
+
+print_targets
+
+exit 0

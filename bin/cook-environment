@@ -1,0 +1,36 @@
+#!/bin/bash
+
+COOK_SETTINGS_DIR=~/.cook
+ENVIRONMENT_FILE=environment
+
+COOK_TARGET_HELPER=cook-target
+COOK_PROJECT_HELPER=cook-project
+
+COOK_TARGET=`$COOK_TARGET_HELPER`
+COOK_PROJECT=`$COOK_PROJECT_HELPER`
+
+ENVIRONMENT_FILE_PATH=$COOK_SETTINGS_DIR/$ENVIRONMENT_FILE
+TARGET_ENVIRONMENT_FILE_PATH=$COOK_SETTINGS_DIR/bsp/$COOK_TARGET/$ENVIRONMENT_FILE
+
+list_environment()
+{
+	if [ ! -f "$ENVIRONMENT_FILE_PATH" ]; then
+		ENVIRONMENT_FILE_PATH=$COOK_PROJECT/$ENVIRONMENT_FILE
+	fi
+
+	if [ -f "$ENVIRONMENT_FILE_PATH" ]; then
+		while read -r line; do
+	    	echo $line
+		done < $ENVIRONMENT_FILE_PATH
+	fi
+
+	if [ -f "$TARGET_ENVIRONMENT_FILE_PATH" ]; then
+		while read -r line; do
+	    	echo $line
+		done < $TARGET_ENVIRONMENT_FILE_PATH
+	fi	
+}
+
+list_environment
+
+exit 0

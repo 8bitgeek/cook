@@ -1,0 +1,32 @@
+#!/bin/bash
+
+COOK_SETTINGS_DIR=~/.cook
+BUILD_KIND_FILE=build-kind
+
+BUILD_KIND=$1
+
+if [ "$BUILD_KIND" != "" ]; then
+	
+	if [ "$BUILD_KIND" == "debug" -o "$BUILD_KIND" == "release" ]; then
+		if [ ! -d "$COOK_SETTINGS_DIR" ]; then
+			mkdir $COOK_SETTINGS_DIR
+		fi
+		echo "BUILD_KIND=$BUILD_KIND" > $COOK_SETTINGS_DIR/$BUILD_KIND_FILE
+	else
+		echo can not $BUILD_KIND
+		exit -1
+	fi
+
+else
+	
+	if [ -f $COOK_SETTINGS_DIR/$BUILD_KIND_FILE ]; then
+		cat $COOK_SETTINGS_DIR/$BUILD_KIND_FILE | cut -f2 -d=
+	else
+		echo no build-kind
+		exit -1
+	fi
+
+fi
+
+exit 0
+

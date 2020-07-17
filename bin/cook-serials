@@ -1,0 +1,28 @@
+#!/bin/bash
+
+COOK_PROJECT_HELPER=cook-project
+
+COOK_SETTINGS_DIR=~/.cook
+SERIALS_FILE=serials
+
+SERIALS_FILE_PATH=$COOK_SETTINGS_DIR/$SERIALS_FILE
+
+COOK_PROJECT=`$COOK_PROJECT_HELPER`
+
+list_serials()
+{
+	if [ ! -f "$SERIALS_FILE_PATH" ]; then
+		SERIALS_FILE_PATH=$COOK_PROJECT/$SERIALS_FILE
+	fi
+
+	if [ -f "$SERIALS_FILE_PATH" ]; then
+		while read -r line; do
+	    	echo $line
+		done < $SERIALS_FILE_PATH
+	fi
+}
+
+
+list_serials
+
+exit 0

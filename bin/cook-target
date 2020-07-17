@@ -1,0 +1,26 @@
+#!/bin/bash
+
+COOK_SETTINGS_DIR=~/.cook
+TARGET_FILE=target
+
+TARGET=$1
+
+if [ "$TARGET" != "" ]; then
+	if [ ! -d "$COOK_SETTINGS_DIR" ]; then
+		mkdir $COOK_SETTINGS_DIR
+	fi		
+	echo "TARGET=$TARGET" > $COOK_SETTINGS_DIR/$TARGET_FILE
+
+else
+	
+	if [ -f $COOK_SETTINGS_DIR/$TARGET_FILE ]; then
+		cat $COOK_SETTINGS_DIR/$TARGET_FILE | cut -f2 -d=
+	else
+		echo no target
+		exit -1
+	fi
+
+fi
+
+exit 0
+

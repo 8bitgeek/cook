@@ -1,0 +1,16 @@
+#!/bin/bash
+COOK_TARGET_HELPER=cook-target
+COOK_TARGET=`$COOK_TARGET_HELPER`
+COOK_TARGET_CLONE=$1
+
+if [ "$COOK_TARGET_CLONE" != "" -a "$COOK_TARGET" != "" ]; then
+	if [ "$COOK_TARGET" != "$COOK_TARGET_CLONE" ]; then
+		cp -arf ~/.cook/bsp/$COOK_TARGET ~/.cook/bsp/$COOK_TARGET_CLONE
+		cp -arf $COOK_PROJECT/feature/bsp/$COOK_TARGET $COOK_PROJECT/feature/bsp/$COOK_TARGET_CLONE
+		cp -arf $COOK_PROJECT/src/bsp/$COOK_TARGET     $COOK_PROJECT/src/bsp/$COOK_TARGET_CLONE
+		cp -arf $COOK_PROJECT/gdb/$COOK_TARGET         $COOK_PROJECT/gdb/$COOK_TARGET_CLONE
+		cp -af  $COOK_PROJECT/ld/$COOK_TARGET.ld       $COOK_PROJECT/ld/$COOK_TARGET_CLONE.ld
+		exit 0
+	fi
+fi
+exit -1

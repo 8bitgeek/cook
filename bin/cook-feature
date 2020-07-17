@@ -1,0 +1,45 @@
+#!/bin/bash
+
+COOK_SETTINGS_DIR=~/.cook
+FEATURE_FILE=feature
+
+FEATURE=$1
+
+is_feature()
+{
+	FEATURE=$1
+	CWD=`pwd`
+	cd $COOK_PROJECT
+	if [ -f feature/$FEATURE/_feature.mk ]; then
+		if [ -f feature/$FEATURE/main.c -o -f feature/$FEATURE/main.cpp ]; then
+			cd $CWD
+			return 1
+		fi
+	fi
+	cd $CWD
+	return 0
+}
+
+if [ "$FEATURE" != "" ]; then
+	if [ ! -d "$COOK_SETTINGS_DIR" ]; then
+		mkdir $COOK_SETTINGS_DIR
+	fi	
+
+	is_feature $FEATURE
+	if [ $? == 1 ]; then 
+		echo "FEATURE=$FEATURE" > $COOK_SETTINGS_DIR/$FEATURE_FILE
+	else
+		exit -1
+	fi
+else
+
+	if [ -f $COOK_SETTINGS_DIR/$FEATURE_FILE ]; then	
+		cat $COOK_SETTINGS_DIR/$FEATURE_FILE | cut -f2 -d=
+	else
+		echo no feature
+		exit -1
+	fi
+fi
+
+exit 0
+

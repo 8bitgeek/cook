@@ -1,0 +1,6 @@
+ENV_LIBMODBUS_ROOT=~/Documents/GitHub/libmodbus/src
+ENV_FREEMODBUS_ROOT=~/Documents/GitHub/freemodbus/modbus
+ENV_CARIBOU_ROOT=~/Documents/GitHub/caribou-rtos
+ENV_LWIP_ROOT=~/Documents/GitHub/caribou-rtos/caribou/3rdparty/lwip-2.1.2
+ENV_EZBUS_ROOT=~/Documents/GitHub/ezbus/src
+ENV_U8G2_ROOT=~/Documents/GitHub/u8g2/csrc

@@ -1,0 +1,10 @@
+#!/bin/bash
+COOK_TARGET_REMOVE=$1
+
+if [ "$COOK_TARGET_REMOVE" != "" ]; then
+	rm -rf ~/.cook/bsp/$COOK_TARGET_REMOVE
+	rm -rf $COOK_PROJECT/feature/bsp/$COOK_TARGET_REMOVE
+	rm -rf $COOK_PROJECT/src/bsp/$COOK_TARGET_REMOVE
+	exit 0
+fi
+exit -1

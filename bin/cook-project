@@ -1,0 +1,26 @@
+#!/bin/bash
+
+COOK_SETTINGS_DIR=~/.cook
+PROJECT_FILE=project
+
+PROJECT=$1
+
+if [ "$PROJECT" != "" ]; then
+	if [ ! -d "$COOK_SETTINGS_DIR" ]; then
+		mkdir $COOK_SETTINGS_DIR
+	fi		
+	echo "PROJECT=$PROJECT" > $COOK_SETTINGS_DIR/$PROJECT_FILE
+
+else
+	
+	if [ -f $COOK_SETTINGS_DIR/$PROJECT_FILE ]; then
+		cat $COOK_SETTINGS_DIR/$PROJECT_FILE | cut -f2 -d=
+	else
+		echo no project
+		exit -1
+	fi
+
+fi
+
+exit 0
+

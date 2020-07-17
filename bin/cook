@@ -1,0 +1,454 @@
+#!/bin/bash
+COOK_VERSION="1.3"
+
+NOP="//NOP//"
+FEATURE_MK="_feature.mk"
+
+COOK_REMOVE_HELPER=cook-remove
+COOK_CLONE_HELPER=cook-clone
+COOK_FEATURE_HELPER=cook-feature
+COOK_FEATURES_HELPER=cook-features
+COOK_TARGET_HELPER=cook-target
+COOK_TARGETS_HELPER=cook-targets
+COOK_BUILD_KIND_HELPER=cook-build-kind
+COOK_PROJECT_HELPER=cook-project
+COOK_ENVIRONMENT_HELPER=cook-environment
+COOK_SERIALS_HELPER=cook-serials
+
+if [ "$COOK_PROJECT" == "" ]; then
+	TMP_COOK_PROJECT=`$COOK_PROJECT_HELPER`
+	if [ $? == 0 ]; then
+		COOK_PROJECT=$TMP_COOK_PROJECT
+	else
+		COOK_PROJECT="."
+	fi
+fi
+
+export MAKE_CMD="make"
+export MAKE_PATH=""
+export MAKE_FEATURE="";
+export COOK_PROJECT
+export SRC_ROOT=$COOK_PROJECT/src
+export FEATURE_ROOT=$COOK_PROJECT/feature
+
+run_archive()
+{
+	RC=0
+	CWD=`pwd`
+	HOSTNAME=`hostname`
+	USERNAME=`whoami`
+	FILENAME=$HOSTNAME"_"$USERNAME"_cook.tar.gz"
+	echo $HOME/$FILENAME
+	cd $HOME
+	tar -czf $HOME/$FILENAME .cook
+	RC=$?
+	cd $CWD
+	return $RC
+}
+
+run_restore()
+{
+	RC=-1
+	FILENAME=$1
+	if [ -f "$FILENAME" ]; then 
+		CWD=`pwd`
+		cd $HOME
+		if [ -d .cook ]; then
+			BACKUP=.cook`date "+%Y-%m-%d:%T"`
+			echo "backup $BACKUP"
+			mv .cook $BACKUP
+		fi
+		tar -xzf $FILENAME
+		RC=$?
+		cd $CWD
+	fi
+	return $RC
+}
+
+default_thread_count()
+{
+	threads=`cat /proc/cpuinfo | grep processor  | wc | tr -s ' ' | cut -d ' ' -f 2`
+	if [ "$threads" = "" -o "$thread" = "0" ]; then
+		threads="4"
+	fi
+	return $threads
+}
+
+export_project_feature_target()
+{
+	export TARGET=`$COOK_TARGET_HELPER`
+
+	EXPORTS=`$COOK_ENVIRONMENT_HELPER`
+	for EXPORT in $EXPORTS; do
+		export $EXPORT
+	done
+
+	SERIAL_INDEX=0
+	SERIALS=`$COOK_SERIALS_HELPER`
+	for SERIAL in $SERIALS; do
+		ENV_HLA_SERIALS[$SERIAL_INDEX]=$SERIAL
+		SERIAL_INDEX=`expr $SERIAL_INDEX + 1`
+	done
+	export ENV_HLA_SERIALS
+	if [ "$HLA_SERIAL" != "" ]; then
+		export ENV_HLA_SERIAL="hla_serial ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
+	fi
+
+
+	export COOK_PROJECT=`$COOK_PROJECT_HELPER`
+	export FEATURE=`$COOK_FEATURE_HELPER`
+	export TARGET=`$COOK_TARGET_HELPER`
+	export TARGET_CPP=`echo $TARGET | sed 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/' | sed 'y/-/_/'`
+}
+
+export_build_kind()
+{
+	export BUILD_KIND=`$COOK_BUILD_KIND_HELPER`
+}
+
+construct_make()
+{
+	export MAKE_PATH=$COOK_PROJECT/feature/$FEATURE
+	export MAKE_FEATURE=$MAKE_PATH/$FEATURE_MK
+
+	if [ -f "$MAKE_FEATURE" ]; then
+		return 0
+	fi
+
+	return -1
+}
+
+exec_make()
+{
+	target=$1
+	verbose=$2
+	threads=$3
+
+	if [ "$target" != "$NOP" ]; then
+		export_project_feature_target
+		export_build_kind
+		construct_make
+		if [ $? == 0 ]; then
+			if [ "$verbose" = "" ]; then
+				$MAKE_CMD -j$threads -f $MAKE_FEATURE $1 > /dev/null
+			else
+				$MAKE_CMD -j$threads -f $MAKE_FEATURE $1
+			fi
+			return $?
+		else
+			echo no $MAKE_FEATURE
+			return -1
+		fi
+	fi
+}
+
+set_project()
+{
+	project=$1
+
+	if [ "$project" != "" ]; then
+		$COOK_PROJECT_HELPER $project
+	fi
+}
+
+set_target()
+{
+	target=$1
+
+	if [ "$target" != "" ]; then
+		$COOK_TARGET_HELPER $target
+	fi
+}
+
+set_feature()
+{
+	feature=$1
+	
+	if [ "$feature" != "" ]; then
+		$COOK_FEATURE_HELPER $feature
+		if [ $? != 0 ]; then 
+			echo "$feature not found"
+			exit -1
+		fi
+	fi
+}
+
+set_build_kind()
+{
+	build_kind=$1
+
+	if [ "$build_kind" != "" ]; then
+		$COOK_BUILD_KIND_HELPER $build_kind
+	fi
+}
+
+do_kill()
+{
+	if [ "$1" != "$NOP" ]; then
+		killall openocd
+	fi
+}
+
+print_features()
+{
+	export_project_feature_target
+	$COOK_FEATURES_HELPER
+}
+
+print_build_state()
+{
+	echo "    project = "`$COOK_PROJECT_HELPER`
+	echo "    feature = "`$COOK_FEATURE_HELPER`
+	echo "     target = "`$COOK_TARGET_HELPER`
+	echo " build-kind = "`$COOK_BUILD_KIND_HELPER`
+}
+
+print_help()
+{
+	echo
+	echo "cook <switches> [feature]"
+	echo
+	echo "--archive            Archive workstation settings"
+	echo "--clean       | -c   Clean current project/target/feature"
+	echo "--clone              [target] Clone new target from current target"
+	echo "--debug       | -d   Build for debugging and launch gdb"
+	echo "--environment | -e   List environment variables"
+	echo "--examine     | -x   Examine build steps (requires 'remake')"
+	echo "--features    | -F   List all features"
+	echo "--flash       | -f   Flash the target"
+	echo "--help        | -?   Produce this help text"
+	echo "--project     | -p   [project-dir]"
+	echo "--rebuild     | -R   Clean and Build"
+	echo "--release     | -r   Build for release"
+	echo "--remove             [target] Remove an existing target"
+	echo "--restore            [archive] Restore workstation settings"
+	echo "--serials     | -S   List serial numbers (export HLA_SERIAL=$HLA_SERIAL) "
+	echo "--state       | -s   Produce listing of current state"
+	echo "--target      | -t   [target]"
+	echo "--targets     | -G   List all targets"
+	echo "--threads     | -T   [count] Compiler Threads"
+	echo "--verbose     | -v   Verbose Output"
+	echo "--version     | -V   Display version information"
+}
+
+exec_command_line()
+{
+	next_is_project=0
+	next_is_target=0
+	next_is_threads=0
+	next_is_clone=0
+	next_is_remove=0
+	next_is_restore=0
+	arg_exec_make=1
+	arg_build_kind=""
+	arg_clean=$NOP
+	arg_flash=$NOP
+	arg_kill=$NOP
+	arg_feature=""
+	arg_target=""
+	arg_project=""
+	arg_verbose=""
+	arg_threads=""
+	arg_clone=""
+	arg_remove=""
+	arg_restore=""
+
+	default_thread_count
+	arg_threads=$?
+
+	for arg in $*; do
+
+		case "$arg" in
+
+			"--archive")
+				run_archive
+				exit $?
+			;;
+
+			"--restore")
+				next_is_restore=1;
+			;;
+
+			"--remove")
+				next_is_remove=1
+			;;
+
+			"--clone")
+				next_is_clone=1
+			;;
+
+			"--version" | "-V")
+				echo $COOK_VERSION
+				exit 0
+			;;
+
+			"--examine" | "-x")
+				MAKE_CMD="remake -x"
+			;;
+
+			"--environment" | "-e")
+				$COOK_ENVIRONMENT_HELPER
+				exit 0;
+			;;
+
+			"--targets" | "-G")
+				$COOK_TARGETS_HELPER
+				exit 0;
+			;;
+
+			"--serials" | "-S")
+				SERIAL_INDEX=0
+				SERIALS=`$COOK_SERIALS_HELPER`
+				for SERIAL in $SERIALS; do
+					echo "<"$SERIAL_INDEX"> "$SERIAL
+					SERIAL_INDEX=`expr $SERIAL_INDEX + 1`
+				done
+				exit 0;
+			;;
+
+			"--help" | "-?")
+				print_help
+				exit 0
+			;;
+
+			"--state" | "-s")
+				print_build_state
+				exit 0
+			;;
+
+			"--debug" | "-d")
+				arg_build_kind="debug"
+				# HACK to clean then changing build kind
+				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+					exec_make "clean" "$arg_verbose" "$arg_threads"
+				fi
+				arg_verbose="verbose"
+			;;
+
+			"--release" | "-r")
+				arg_build_kind="release"
+				# HACK to clean then changing build kind
+				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+					exec_make "clean" "$arg_verbose" "$arg_threads"
+				fi
+			;;
+
+			"--rebuild" | "-R")
+				# HACK to clean then build
+				exec_make "clean" "$arg_verbose" "$arg_threads"
+			;;
+
+			"--kill" | "-k")
+				arg_kill="kill"
+				arg_exec_make=0
+			;;
+
+			"--verbose" | "-v")
+				arg_verbose="verbose"
+			;;
+
+			"--clean" | "-c")
+				arg_clean="clean"
+			;;
+
+			"--flash" | "-f")
+				arg_flash="flash"
+				# HACK be sure openocd is shut down
+				do_kill "kill"
+			;;
+
+			"--threads" | "-T")
+				next_is_threads=1
+			;;
+
+			"--project" | "-p")
+				next_is_project=1
+			;;
+
+			"--target" | "-t")
+				next_is_target=1
+			;;
+
+			"--features" | "-F")
+				print_features
+				exit 0
+			;;
+
+			*)
+				if [ $next_is_restore == 1 ]; then
+					next_is_restore=0;
+					arg_restore=$arg;
+					run_restore $arg_restore
+					exit $?
+				elif [ $next_is_remove == 1 ]; then
+					next_is_remove=0;
+					arg_remove=$arg;
+					$COOK_REMOVE_HELPER $arg_remove
+					if [ $? != 0 ]; then 
+						echo "remove failed"
+						exit -1
+					fi
+					exit 0
+				elif [ $next_is_clone == 1 ]; then
+					next_is_clone=0;
+					arg_clone=$arg;
+					$COOK_CLONE_HELPER $arg_clone
+					if [ $? != 0 ]; then 
+						echo "clone failed"
+						exit -1
+					fi
+					exit 0
+				elif [ $next_is_threads == 1 ]; then
+					next_is_threads=0;
+					arg_threads=$arg
+				elif [ $next_is_project == 1 ]; then
+					next_is_project=0
+					arg_project=$arg
+				elif [ $next_is_target == 1 ]; then
+					next_is_target=0
+					arg_target=$arg
+					# HACK to force clean when changing target
+					if [ "`$COOK_TARGET_HELPER`" != "$arg_target" ]; then
+						exec_make "clean" "$arg_verbose" "$arg_threads"
+					fi
+				elif [ "$arg_feature" == "" ]; then
+					arg_feature=$arg
+					# HACK to clean when changing feature
+					if [ "`$COOK_FEATURE_HELPER`" != "$arg_feature" ]; then
+						exec_make "clean" "$arg_verbose" "$arg_threads"
+					fi
+				fi
+			;;
+		
+		esac
+
+	done
+
+	if [ $next_is_project == 1 ]; then
+		$COOK_PROJECT_HELPER
+		exit $?
+	fi
+
+	do_kill 		$arg_kill
+	set_project     $arg_project
+	set_target 		$arg_target
+	set_feature		$arg_feature
+	set_build_kind 	$arg_build_kind
+	exec_make 		"$arg_clean" "$arg_verbose" "$arg_threads"
+	if [ "$arg_build_kind" == "debug" ]; then
+		exec_make "debug" "$arg_verbose" "$arg_threads"
+	else
+		if [ "$arg_clean" == $NOP ]; then
+			exec_make "" "$arg_verbose" "$arg_threads"
+		elif [ "$arg_build_kind" != "" ]; then
+			exec_make "" "$arg_verbose" "$arg_threads"
+		fi
+	fi
+	exec_make "$arg_flash" "$arg_verbose" "$arg_threads"
+
+	return $?
+}
+
+
+exec_command_line $*
+exit $?
