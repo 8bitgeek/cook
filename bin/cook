@@ -67,7 +67,8 @@ run_restore()
 
 default_thread_count()
 {
-	threads=`cat /proc/cpuinfo | grep processor  | wc | tr -s ' ' | cut -d ' ' -f 2`
+	# threads=`cat /proc/cpuinfo | grep processor  | wc | tr -s ' ' | cut -d ' ' -f 2`
+	threads=`nproc`
 	if [ "$threads" = "" -o "$thread" = "0" ]; then
 		threads="4"
 	fi
