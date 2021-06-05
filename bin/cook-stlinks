@@ -1,0 +1,15 @@
+#!/bin/bash
+
+
+print_stlinks()
+{
+	DEVICES=`lsusb | grep STMicroelectronics | grep LINK | cut -d\\  -f 6` 
+    for DEVICE in $DEVICES; do
+        # echo $DEVICE `lsusb -d $DEVICE -v 2> /dev/null | grep iSerial | xargs | cut -d\\  -f 3`
+        echo `lsusb -d $DEVICE -v 2> /dev/null | grep iSerial | xargs | cut -d\\  -f 3`
+    done
+}
+
+print_stlinks
+
+exit 0
