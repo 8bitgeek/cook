@@ -93,6 +93,7 @@ export_project_feature_target()
 	export ENV_HLA_SERIALS
 	if [ "$HLA_SERIAL" != "" ]; then
 		export ENV_HLA_SERIAL="hla_serial ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
+		# export ENV_HLA_SERIAL="hla_swd ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
 	fi
 
 
