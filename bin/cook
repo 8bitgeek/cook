@@ -1,5 +1,5 @@
 #!/bin/bash
-COOK_VERSION="1.3"
+COOK_VERSION="2.0"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
