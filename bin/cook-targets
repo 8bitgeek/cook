@@ -3,7 +3,7 @@
 print_targets()
 {
 	CWD=`pwd`
-	cd $COOK_PROJECT/feature/bsp
+	cd $COOK_PROJECT/_feature/_bsp
 	TARGETS=`ls -1`
 	for TARGET in $TARGETS; do
 		echo $TARGET

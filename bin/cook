@@ -28,8 +28,8 @@ export MAKE_CMD="make"
 export MAKE_PATH=""
 export MAKE_FEATURE="";
 export COOK_PROJECT
-export SRC_ROOT=$COOK_PROJECT/src
-export FEATURE_ROOT=$COOK_PROJECT/feature
+export SRC_ROOT=$COOK_PROJECT/_src
+export FEATURE_ROOT=$COOK_PROJECT/_feature
 
 run_archive()
 {
@@ -110,7 +110,7 @@ export_build_kind()
 
 construct_make()
 {
-	export MAKE_PATH=$COOK_PROJECT/feature/$FEATURE
+	export MAKE_PATH=$COOK_PROJECT/_feature/$FEATURE
 	export MAKE_FEATURE=$MAKE_PATH/$FEATURE_MK
 
 	if [ -f "$MAKE_FEATURE" ]; then

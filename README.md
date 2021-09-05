@@ -47,7 +47,7 @@ current state:
 - feature
   - _bsp
   - _common
-  - _main
+  - main
 - gdb
 - ld
 - src
@@ -66,25 +66,25 @@ Placement for custom shell scrips and executables.
 
 Placement for top-level features.
 
-## feature/_common
+## _feature/_common
 
 Placement for properties common to all features.
 
-## feature/_common/_bsp.mk
-## feature/_common/_feature.mk
-## feature/_common/build.mk
-## feature/_common/cflags-debug.mk
-## feature/_common/cflags-release.mk
-## feature/_common/cflags.mk
-## feature/_common/clibs.mk
-## feature/_common/includes.mk
-## feature/_common/ocd.mk
-## feature/_common/paths.mk
-## feature/_common/tools.mk
+## _feature/_common/_bsp.mk
+## _feature/_common/_feature.mk
+## _feature/_common/build.mk
+## _feature/_common/cflags-debug.mk
+## _feature/_common/cflags-release.mk
+## _feature/_common/cflags.mk
+## _feature/_common/clibs.mk
+## _feature/_common/includes.mk
+## _feature/_common/ocd.mk
+## _feature/_common/paths.mk
+## _feature/_common/tools.mk
 
-## feature/main
+## _feature/_main
 
-Placement for the "final" feature, or application.
+By convention, placement for the "final" feature, or application.
 
 ## gdb
 
@@ -109,3 +109,10 @@ Placement for source code dependencies.
 - SRCS_CXX
 - FEATURE_ROOT
   
+
+# ORDER OF OPERATIONS
+
+Top level makefile.
+
+MAKE_FEATURE=$MAKE_PATH/$FEATURE_MK
+
