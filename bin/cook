@@ -323,6 +323,7 @@ exec_command_line()
 
 			"--openocd" | "-o")
 				arg_build_kind="openocd"
+				arg_verbose="verbose"
 			;;
 
 			"--debug" | "-d")
