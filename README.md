@@ -108,7 +108,20 @@ Placement for source code dependencies.
 - SRCS_CC
 - SRCS_CXX
 - FEATURE_ROOT
-  
+
+# TARGET PROJECT ENVIRONMENT VARIABLES
+
+```
+ENV_OPENOCD_INTERFACE=ftdi/um232h
+ENV_OPENOCD_TARGET=gd32vf103
+ENV_OPENOCD_ADAPTER_SPEED=1000
+ENV_GCC_ROOT=/opt/riscv-gcc/bin/
+ENV_GCC_PREFIX=$(ENV_GCC_ROOT)/riscv32-unknown-elf-
+ENV_GCC_LIB=/../lib/gcc/riscv32-unknown-elf/10.1.0
+ENV_LIB_GCC=$(ENV_GCC_ROOT)$(ENV_GCC_LIB)/libgcc.a
+ENV_LIB_M=$(ENV_GCC_ROOT)/../riscv32-unknown-elf/lib/libm.a
+ENV_LIB_GPP=$(ENV_GCC_ROOT)/../riscv32-unknown-elf/lib/libstdc++.a
+```
 
 # ORDER OF OPERATIONS
 

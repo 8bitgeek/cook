@@ -95,7 +95,9 @@ export_project_feature_target()
 		export ENV_HLA_SERIAL="hla_serial ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
 		# export ENV_HLA_SERIAL="hla_swd ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
 	fi
-
+	if [ "$ENV_OPENOCD_ADAPTER_SPEED" != "" ]; then
+		export OPENOCD_ADAPTER_SPEED="adapter speed $ENV_OPENOCD_ADAPTER_SPEED"
+	fi 
 
 	export COOK_PROJECT=`$COOK_PROJECT_HELPER`
 	export FEATURE=`$COOK_FEATURE_HELPER`
