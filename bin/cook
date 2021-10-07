@@ -221,6 +221,7 @@ print_help()
 	echo "--features    | -F   List all features"
 	echo "--flash       | -f   Flash the target"
 	echo "--help        | -?   Produce this help text"
+	echo "--openocd     | -o   Start the OpenOCD server independantly"
 	echo "--project     | -p   [project-dir]"
 	echo "--rebuild     | -R   Clean and Build"
 	echo "--release     | -r   Build for release"
@@ -228,8 +229,8 @@ print_help()
 	echo "--restore            [archive] Restore workstation settings"
 	echo "--serials     | -S   List serial numbers (export HLA_SERIAL=$HLA_SERIAL) "
 	echo "--state       | -s   Produce listing of current state"
-	echo "--target      | -t   [target]"
 	echo "--targets     | -G   List all targets"
+	echo "--target      | -t   [target]"
 	echo "--threads     | -T   [count] Compiler Threads"
 	echo "--verbose     | -v   Verbose Output"
 	echo "--version     | -V   Display version information"
@@ -318,6 +319,10 @@ exec_command_line()
 			"--state" | "-s")
 				print_build_state
 				exit 0
+			;;
+
+			"--openocd" | "-o")
+				arg_build_kind="openocd"
 			;;
 
 			"--debug" | "-d")
@@ -441,6 +446,8 @@ exec_command_line()
 	exec_make 		"$arg_clean" "$arg_verbose" "$arg_threads"
 	if [ "$arg_build_kind" == "debug" ]; then
 		exec_make "debug" "$arg_verbose" "$arg_threads"
+	elif [ "$arg_build_kind" == "openocd" ]; then
+		exec_make "openocd" "$arg_verbose" "$arg_threads"
 	else
 		if [ "$arg_clean" == $NOP ]; then
 			exec_make "" "$arg_verbose" "$arg_threads"
