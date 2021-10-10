@@ -10,8 +10,8 @@ is_feature()
 	FEATURE=$1
 	CWD=`pwd`
 	cd $COOK_PROJECT
-	if [ -f feature/$FEATURE/_feature.mk ]; then
-		if [ -f feature/$FEATURE/main.c -o -f feature/$FEATURE/main.cpp ]; then
+	if [ -f _feature/$FEATURE/_feature.mk ]; then
+		if [ -f _feature/$FEATURE/main.c -o -f _feature/$FEATURE/main.cpp ]; then
 			cd $CWD
 			return 1
 		fi

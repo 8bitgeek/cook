@@ -1,5 +1,5 @@
 #!/bin/bash
-COOK_VERSION="1.3"
+COOK_VERSION="2.0"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
@@ -28,8 +28,8 @@ export MAKE_CMD="make"
 export MAKE_PATH=""
 export MAKE_FEATURE="";
 export COOK_PROJECT
-export SRC_ROOT=$COOK_PROJECT/src
-export FEATURE_ROOT=$COOK_PROJECT/feature
+export SRC_ROOT=$COOK_PROJECT/_src
+export FEATURE_ROOT=$COOK_PROJECT/_feature
 
 run_archive()
 {
@@ -95,7 +95,9 @@ export_project_feature_target()
 		export ENV_HLA_SERIAL="hla_serial ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
 		# export ENV_HLA_SERIAL="hla_swd ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
 	fi
-
+	if [ "$ENV_OPENOCD_ADAPTER_SPEED" != "" ]; then
+		export OPENOCD_ADAPTER_SPEED="adapter speed $ENV_OPENOCD_ADAPTER_SPEED"
+	fi 
 
 	export COOK_PROJECT=`$COOK_PROJECT_HELPER`
 	export FEATURE=`$COOK_FEATURE_HELPER`
@@ -110,7 +112,7 @@ export_build_kind()
 
 construct_make()
 {
-	export MAKE_PATH=$COOK_PROJECT/feature/$FEATURE
+	export MAKE_PATH=$COOK_PROJECT/_feature/$FEATURE
 	export MAKE_FEATURE=$MAKE_PATH/$FEATURE_MK
 
 	if [ -f "$MAKE_FEATURE" ]; then
@@ -219,6 +221,7 @@ print_help()
 	echo "--features    | -F   List all features"
 	echo "--flash       | -f   Flash the target"
 	echo "--help        | -?   Produce this help text"
+	echo "--openocd     | -o   Start the OpenOCD server independantly"
 	echo "--project     | -p   [project-dir]"
 	echo "--rebuild     | -R   Clean and Build"
 	echo "--release     | -r   Build for release"
@@ -226,8 +229,8 @@ print_help()
 	echo "--restore            [archive] Restore workstation settings"
 	echo "--serials     | -S   List serial numbers (export HLA_SERIAL=$HLA_SERIAL) "
 	echo "--state       | -s   Produce listing of current state"
-	echo "--target      | -t   [target]"
 	echo "--targets     | -G   List all targets"
+	echo "--target      | -t   [target]"
 	echo "--threads     | -T   [count] Compiler Threads"
 	echo "--verbose     | -v   Verbose Output"
 	echo "--version     | -V   Display version information"
@@ -316,6 +319,11 @@ exec_command_line()
 			"--state" | "-s")
 				print_build_state
 				exit 0
+			;;
+
+			"--openocd" | "-o")
+				arg_build_kind="openocd"
+				arg_verbose="verbose"
 			;;
 
 			"--debug" | "-d")
@@ -439,6 +447,8 @@ exec_command_line()
 	exec_make 		"$arg_clean" "$arg_verbose" "$arg_threads"
 	if [ "$arg_build_kind" == "debug" ]; then
 		exec_make "debug" "$arg_verbose" "$arg_threads"
+	elif [ "$arg_build_kind" == "openocd" ]; then
+		exec_make "openocd" "$arg_verbose" "$arg_threads"
 	else
 		if [ "$arg_clean" == $NOP ]; then
 			exec_make "" "$arg_verbose" "$arg_threads"

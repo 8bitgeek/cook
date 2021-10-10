@@ -4,10 +4,10 @@ print_features()
 {
 	CWD=`pwd`
 	cd $COOK_PROJECT
-	FEATURES=`find feature/ -type d | sort | cut -f 2- -d/`
+	FEATURES=`find _feature/ -type d | sort | cut -f 2- -d/`
 	for FEATURE in $FEATURES; do
-		if [ -f feature/$FEATURE/_feature.mk ]; then
-			if [ -f feature/$FEATURE/main.c -o -f feature/$FEATURE/main.cpp ]; then
+		if [ -f _feature/$FEATURE/_feature.mk ]; then
+			if [ -f _feature/$FEATURE/main.c -o -f _feature/$FEATURE/main.cpp ]; then
 				echo $FEATURE
 			fi
 		fi

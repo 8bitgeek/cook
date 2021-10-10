@@ -6,8 +6,8 @@ COOK_TARGET_CLONE=$1
 if [ "$COOK_TARGET_CLONE" != "" -a "$COOK_TARGET" != "" ]; then
 	if [ "$COOK_TARGET" != "$COOK_TARGET_CLONE" ]; then
 		cp -arf ~/.cook/bsp/$COOK_TARGET ~/.cook/bsp/$COOK_TARGET_CLONE
-		cp -arf $COOK_PROJECT/feature/bsp/$COOK_TARGET $COOK_PROJECT/feature/bsp/$COOK_TARGET_CLONE
-		cp -arf $COOK_PROJECT/src/bsp/$COOK_TARGET     $COOK_PROJECT/src/bsp/$COOK_TARGET_CLONE
+		cp -arf $COOK_PROJECT/_feature/_bsp/$COOK_TARGET $COOK_PROJECT/_feature/_bsp/$COOK_TARGET_CLONE
+		cp -arf $COOK_PROJECT/_src/_bsp/$COOK_TARGET     $COOK_PROJECT/_src/_bsp/$COOK_TARGET_CLONE
 		cp -arf $COOK_PROJECT/gdb/$COOK_TARGET         $COOK_PROJECT/gdb/$COOK_TARGET_CLONE
 		cp -af  $COOK_PROJECT/ld/$COOK_TARGET.ld       $COOK_PROJECT/ld/$COOK_TARGET_CLONE.ld
 		exit 0
