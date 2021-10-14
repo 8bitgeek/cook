@@ -1,0 +1,15 @@
+ENV_BRISCITS_ROOT=$(COOK_PROJECT)/3rdparty/briscits
+ENV_OPENCM3_ROOT=$(COOK_PROJECT)/3rdparty/libopencm3
+ENV_MICROAMP_ROOT=$(COOK_PROJECT)/3rdparty/microamp
+ENV_LIBMODBUS_ROOT=~/Documents/GitHub/libmodbus/src
+ENV_FREEMODBUS_ROOT=~/Documents/GitHub/freemodbus/modbus
+ENV_CARIBOU_ROOT=~/Documents/GitHub/caribou-rtos
+ENV_LWIP_ROOT=~/Documents/GitHub/caribou-rtos/caribou/3rdparty/lwip-2.1.2
+ENV_EZBUS_ROOT=~/Documents/GitHub/ezbus_runner/libezbus/src
+ENV_EZBUS_RUNNER_ROOT=~/Documents/GitHub/ezbus_runner/src
+ENV_EZBUS_CMDLINE_ROOT=~/Documents/GitHub/ezbus_runner/libezbus_cmdline/src
+ENV_U8G2_ROOT=~/Documents/GitHub/u8g2/csrc
+ENV_OPENOCD_ROOT=/usr/local/share/openocd
+ENV_LIBS19_ROOT=~/Documents/GitHub/libs19
+ENV_LIBZPU_ROOT=~/Documents/GitHub/libzpu
+ENV_CJSON_ROOT=~/Documents/GitHub/cJSON
