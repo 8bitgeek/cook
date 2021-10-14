@@ -6,6 +6,6 @@
  ,
  {
   "fn":"/home/mike/development/bitbucket/sonic-src/_feature/ui/blinky/main.c",
-  "meta":[  "feature caribou",  "source delay",  "source led"]
+  "meta":[  "source delay",  "source led"]
  }
 ]}

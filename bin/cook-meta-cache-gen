@@ -18,7 +18,9 @@ def extract_raw_meta( fn ):
             if line:
                 line = line.strip()
                 line = line.replace('\t', ' ')
-                if ( line.startswith('/*!#') and line.endswith('*/') ):
+                if ( line.startswith('/*--') and 
+                        line.endswith('*/') and 
+                        not line.startswith('/*---') ):
                     raw_meta.append(line)
             else:
                 not_eof = False
