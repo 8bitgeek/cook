@@ -5,6 +5,8 @@ import os,codecs
 import math,time
 import json
 
+output={}
+
 def load_json_text( fn ):
     json_text=''
     # @FIXME handle file open failure exception gracefully
@@ -19,11 +21,26 @@ def load_json_text( fn ):
         fo.close()
     return json_text
 
+def update_output( dn, fn, meta ):
+    if ( output.get(dn) == None ):
+        metaobj={}
+        metaobj[fn]=meta
+        if ( output.get(dn) == None ):
+            output[dn]=[]
+        output[dn].append(metaobj)
+    return 
+
 def parse_cache( cache_fn ):
     json_text = load_json_text(cache_fn)
     cache = json.loads(json_text)
-    print(cache["cache"])
-    return
+    for fileno in range(len(cache["cache"])):
+        metaobj = cache["cache"][fileno]
+        metadata = metaobj["meta"]
+        filepath = metaobj["fn"]
+        dn=os.path.dirname(filepath)
+        fn=os.path.basename(filepath)
+        update_output(dn,fn,metadata)
+    return 
 
 parser = argparse.ArgumentParser(description='Parses cook meta cache output and generate makefile snippet output.')
 parser.add_argument('--cache', nargs='*', help='cache file to scan')
@@ -33,4 +50,4 @@ args = parser.parse_args()
 for cacheno in range(len(args.cache)): 
     cache_name=args.cache[cacheno]
     parse_cache(cache_name)
-
+print(output)

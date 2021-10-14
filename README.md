@@ -64,7 +64,8 @@ Placement for custom shell scrips and executables.
 
 ## feature
 
-Placement for top-level features.
+Placement for top-level features. Features are stand-alone executables.
+Features must have a main() function.
 
 ## _feature/_common
 
