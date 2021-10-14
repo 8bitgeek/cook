@@ -1,0 +1,36 @@
+#!/usr/bin/python3
+
+import argparse
+import os,codecs
+import math,time
+import json
+
+def load_json_text( fn ):
+    json_text=''
+    # @FIXME handle file open failure exception gracefully
+    with codecs.open(fn, 'r', encoding='utf-8', errors='ignore') as fo:
+        not_eof = True
+        while not_eof:
+            line = fo.readline()
+            if line:
+                json_text+=line
+            else:
+                not_eof = False
+        fo.close()
+    return json_text
+
+def parse_cache( cache_fn ):
+    json_text = load_json_text(cache_fn)
+    cache = json.loads(json_text)
+    print(cache["cache"])
+    return
+
+parser = argparse.ArgumentParser(description='Parses cook meta cache output and generate makefile snippet output.')
+parser.add_argument('--cache', nargs='*', help='cache file to scan')
+
+file_count=0
+args = parser.parse_args()
+for cacheno in range(len(args.cache)): 
+    cache_name=args.cache[cacheno]
+    parse_cache(cache_name)
+

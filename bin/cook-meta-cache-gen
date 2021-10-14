@@ -17,6 +17,7 @@ def extract_raw_meta( fn ):
             line = fo.readline()
             if line:
                 line = line.strip()
+                line = line.replace('\t', ' ')
                 if ( line.startswith('/*!#') and line.endswith('*/') ):
                     raw_meta.append(line)
             else:
