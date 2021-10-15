@@ -42,28 +42,30 @@ parser.add_argument('--dir', nargs='*', help='directories to scan')
 
 file_count=0
 args = parser.parse_args()
-print('{"cache":[')
-for dir in range(len(args.dir)): 
-    dir_name=args.dir[dir]
-    source_files = recurse_dir(dir_name)
-    for fileno in range(len(source_files)):
-        fn=source_files[fileno]
-        if ( file_count ):
-            json_snippet=' ,\n '
-        else:
-            json_snippet=' '
-        json_snippet+='{\n  "fn":"'+fn+'"'
-        raw_meta = extract_raw_meta(source_files[fileno])
-        if ( len(raw_meta) > 0 ):
-            file_count+=1
-            json_snippet+=',\n  "meta":['
-            for metano in range(len(raw_meta)):
-                raw_meta_str = raw_meta[metano]
-                json_snippet+='  "'+extract_cooked_meta( raw_meta_str )+'"'
-                if ( metano < len(raw_meta)-1 ):
-                    json_snippet+=','
-            json_snippet+=']\n'
-        json_snippet+=' }'
-        if ( len(raw_meta) ):
+if ( args.dir != None ):
+    print('{"cache":[')
+    for dir in range(len(args.dir)): 
+        dir_name=args.dir[dir]
+        source_files = recurse_dir(dir_name)
+        for fileno in range(len(source_files)):
+            fn=source_files[fileno]
+            if ( file_count ):
+                json_snippet=' ,\n '
+            else:
+                json_snippet=' '
+            json_snippet+='{\n  "fn":"'+fn+'"'
+            raw_meta = extract_raw_meta(source_files[fileno])
+            if ( len(raw_meta) > 0 ):
+                # file_count+=1
+                json_snippet+=',\n  "meta":['
+                for metano in range(len(raw_meta)):
+                    raw_meta_str = raw_meta[metano]
+                    json_snippet+='  "'+extract_cooked_meta( raw_meta_str )+'"'
+                    if ( metano < len(raw_meta)-1 ):
+                        json_snippet+=','
+                json_snippet+=']\n'
+            json_snippet+=' }'
+            # if ( len(raw_meta) ):
             print(json_snippet)
-print(']}')
+            file_count+=1
+    print(']}')

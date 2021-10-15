@@ -7,6 +7,7 @@ import json
 
 feature={}
 source={}
+fault='OK'
 
 def load_json_text( fn ):
     json_text=''
@@ -23,27 +24,25 @@ def load_json_text( fn ):
     return json_text
 
 def update_feature( dn, fn, meta ):
+    metaobj={}
+    metaobj[fn]=meta
     if ( feature.get(dn) == None ):
-        metaobj={}
-        metaobj[fn]=meta
-        if ( feature.get(dn) == None ):
-            feature[dn]=[]
-        feature[dn].append(metaobj)
+        feature[dn]=[]
+    feature[dn].append(metaobj)
     return 
 
 def update_source( dn, fn, meta ):
+    metaobj={}
+    metaobj[fn]=meta
     if ( source.get(dn) == None ):
-        metaobj={}
-        metaobj[fn]=meta
-        if ( source.get(dn) == None ):
-            source[dn]=[]
-        source[dn].append(metaobj)
+        source[dn]=[]
+    source[dn].append(metaobj)
     return 
 
 def classify( dn ):
     if ( dn.find('/_feature/') >= 0 ):
         return 'feature'
-    if ( dn_find('/_src/') >= 0 ):
+    if ( dn.find('/_src/') >= 0 ):
         return 'src'
     return ''
 
@@ -51,8 +50,11 @@ def parse_cache( cache_fn ):
     json_text = load_json_text(cache_fn)
     cache = json.loads(json_text)
     for fileno in range(len(cache["cache"])):
+        metadata={}
         metaobj = cache["cache"][fileno]
-        metadata = metaobj["meta"]
+        print(json.dumps(metaobj, sort_keys=False, indent=4))
+        if ( metaobj.get("meta") ):
+            metadata = metaobj["meta"]
         filepath = metaobj["fn"]
         dn=os.path.dirname(filepath)
         fn=os.path.basename(filepath)
@@ -62,17 +64,26 @@ def parse_cache( cache_fn ):
             update_source(dn,fn,metadata)
     return 
 
-def write_feature_fragment():
-    print(feature)
-    return
+def write_feature_fragments():
+    rc = 'OK'
+    print('{"feature":')
+    print(json.dumps(feature, sort_keys=False, indent=4))
+    print('}')
+    return rc
 
-def write_source_fragment():
-    print(source)
-    return
+def write_source_fragments():
+    rc = 'OK'
+    print('{"source":')
+    print(json.dumps(source, sort_keys=False, indent=4))
+    print('}')
+    return rc
 
 def write_fragments():
-    # @FIXME write the fragments
-    return
+    rc=write_source_fragments()
+    if ( rc == 'OK' ):
+        print(',')
+        rc=write_feature_fragments()
+    return rc
 
 parser = argparse.ArgumentParser(description='Parses cook meta cache output and generate makefile snippet output.')
 parser.add_argument('--cache', nargs='*', help='cache file to scan')
@@ -82,4 +93,10 @@ args = parser.parse_args()
 for cacheno in range(len(args.cache)): 
     cache_name=args.cache[cacheno]
     parse_cache(cache_name)
-write_fragments()
+
+fault = write_fragments()
+if ( fault == 'OK' ):
+    exit(0)
+else:
+    print(fault)
+    exit(-1)
