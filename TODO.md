@@ -1,5 +1,6 @@
-- cook-meta-cache-parse
-    - specify env vars to import on the command line.
-    - conditions (if...elseif...else).
-- specifications for
-    - consolodate _build folder in project 
+- V3
+    - cook-meta-cache-parse
+        - specify env vars to import on the command line.
+        - conditions (if...elseif...else).
+    - specifications for
+        - consolodate _build folder in project 
