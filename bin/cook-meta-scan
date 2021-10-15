@@ -3,6 +3,7 @@
 import argparse
 import os,codecs
 import math,time
+import json
 
 def extract_cooked_meta( raw_meta ):
     cooked_meta = raw_meta[4:-2]
@@ -41,9 +42,10 @@ parser = argparse.ArgumentParser(description='Scan dirs for meta and generate ca
 parser.add_argument('--dir', nargs='*', help='directories to scan')
 
 file_count=0
+json_text=''
 args = parser.parse_args()
 if ( args.dir != None ):
-    print('{"cache":[')
+    json_text+='{"cache":[\n'
     for dir in range(len(args.dir)): 
         dir_name=args.dir[dir]
         source_files = recurse_dir(dir_name)
@@ -56,7 +58,6 @@ if ( args.dir != None ):
             json_snippet+='{\n  "fn":"'+fn+'"'
             raw_meta = extract_raw_meta(source_files[fileno])
             if ( len(raw_meta) > 0 ):
-                # file_count+=1
                 json_snippet+=',\n  "meta":['
                 for metano in range(len(raw_meta)):
                     raw_meta_str = raw_meta[metano]
@@ -65,7 +66,8 @@ if ( args.dir != None ):
                         json_snippet+=','
                 json_snippet+=']\n'
             json_snippet+=' }'
-            # if ( len(raw_meta) ):
-            print(json_snippet)
+            json_text+=(json_snippet+'\n')
             file_count+=1
-    print(']}')
+    json_text+=']}\n'
+    print(json.dumps(json.loads(json_text), sort_keys=False, indent=4))
+

@@ -1,6 +1,11 @@
 - V3
+    - cook-meta-scan
+        - include md5sum and file date/time stamp
+        - less strict comment '/*--' multi-line-until '*/' for instance.
+    - cook-meta-rescan
+        - only re-scan meta from files whos date/time + md5sum mismatch.
     - cook-meta-cache-parse
         - specify env vars to import on the command line.
-        - conditions (if...elseif...else).
-    - specifications for
+        - conditions *(if...elseif...else)*.
+    - make specifications for
         - consolodate _build folder in project 
