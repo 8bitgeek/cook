@@ -5,7 +5,8 @@ import os,codecs
 import math,time
 import json
 
-output={}
+feature={}
+source={}
 
 def load_json_text( fn ):
     json_text=''
@@ -21,14 +22,30 @@ def load_json_text( fn ):
         fo.close()
     return json_text
 
-def update_output( dn, fn, meta ):
-    if ( output.get(dn) == None ):
+def update_feature( dn, fn, meta ):
+    if ( feature.get(dn) == None ):
         metaobj={}
         metaobj[fn]=meta
-        if ( output.get(dn) == None ):
-            output[dn]=[]
-        output[dn].append(metaobj)
+        if ( feature.get(dn) == None ):
+            feature[dn]=[]
+        feature[dn].append(metaobj)
     return 
+
+def update_source( dn, fn, meta ):
+    if ( source.get(dn) == None ):
+        metaobj={}
+        metaobj[fn]=meta
+        if ( source.get(dn) == None ):
+            source[dn]=[]
+        source[dn].append(metaobj)
+    return 
+
+def classify( dn ):
+    if ( dn.find('/_feature/') >= 0 ):
+        return 'feature'
+    if ( dn_find('/_src/') >= 0 ):
+        return 'src'
+    return ''
 
 def parse_cache( cache_fn ):
     json_text = load_json_text(cache_fn)
@@ -39,8 +56,23 @@ def parse_cache( cache_fn ):
         filepath = metaobj["fn"]
         dn=os.path.dirname(filepath)
         fn=os.path.basename(filepath)
-        update_output(dn,fn,metadata)
+        if ( classify(dn) == 'feature' ):
+            update_feature(dn,fn,metadata)
+        else:
+            update_source(dn,fn,metadata)
     return 
+
+def write_feature_fragment():
+    print(feature)
+    return
+
+def write_source_fragment():
+    print(source)
+    return
+
+def write_fragments():
+    # @FIXME write the fragments
+    return
 
 parser = argparse.ArgumentParser(description='Parses cook meta cache output and generate makefile snippet output.')
 parser.add_argument('--cache', nargs='*', help='cache file to scan')
@@ -50,4 +82,4 @@ args = parser.parse_args()
 for cacheno in range(len(args.cache)): 
     cache_name=args.cache[cacheno]
     parse_cache(cache_name)
-print(output)
+write_fragments()
