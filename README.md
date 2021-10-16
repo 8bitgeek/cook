@@ -6,6 +6,10 @@
 * 'cook' depends upon bash, make, remake, gcc, gdb, openocd
 
 # INSTALLATION
+```
+git submodule init
+git submodule update
+```
 
 * Include cook/bin folder in you PATH environment variable.
 * Copy the contents of cook/settings/home_dot_cook to $HOME/.cook and edit as required.
