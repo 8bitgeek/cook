@@ -1,3 +1,6 @@
 [submodule "bin/python-parser"]
 	path = bin/python-parser
 	url = https://github.com/8bitgeek/python-parser.git
+[submodule "bin/pycparser"]
+	path = bin/pycparser
+	url = https://github.com/8bitgeek/pycparser.git
