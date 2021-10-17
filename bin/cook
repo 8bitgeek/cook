@@ -166,9 +166,9 @@ exec_make()
 		construct_make
 		if [ $? == 0 ]; then
 			if [ "$verbose" = "" ]; then
-				$MAKE_CMD -j$threads -f $MAKE_FEATURE $1 > /dev/null
+				$MAKE_CMD -j$threads -f $MAKE_FEATURE $target > /dev/null
 			else
-				$MAKE_CMD -j$threads -f $MAKE_FEATURE $1
+				$MAKE_CMD -j$threads -f $MAKE_FEATURE $target
 			fi
 			return $?
 		else
