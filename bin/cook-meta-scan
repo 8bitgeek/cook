@@ -100,5 +100,10 @@ if ( args.dir != None ):
             json_text+=(json_snippet+'\n')
             file_count+=1
     json_text+=']}\n'
-    print(json.dumps(json.loads(json_text), sort_keys=False, indent=4))
-
+    try:
+        print(json.dumps(json.loads(json_text), sort_keys=False, indent=4))
+    except json.JSONDecodeError as err:
+        lines = json_text.split('\n')
+        print(lines[err.lineno-1])
+        print((err.colno-1)*' '+'^')
+        print((err.colno-1)*' '+err.msg)
