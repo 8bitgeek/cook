@@ -134,3 +134,13 @@ Top level makefile.
 
 MAKE_FEATURE=$MAKE_PATH/$FEATURE_MK
 
+
+# SUBLIME TEXT BUILD 
+
+```
+{
+  "shell_cmd": "cook",
+  "file_regex": "^\\s*(\\S[^:]*).(\\d+):(\\d+)"
+}
+
+```
