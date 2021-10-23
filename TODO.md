@@ -9,3 +9,4 @@
         - conditions *(if...elseif...else)*.
     - make specifications for
         - consolodate _build folder in project 
+    - installer
