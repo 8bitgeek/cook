@@ -138,6 +138,8 @@ MAKE_FEATURE=$MAKE_PATH/$FEATURE_MK
 # SUBLIME TEXT BUILD 
 
 ```
+cook.sublime-build:
+
 {
   "shell_cmd": "cook",
   "file_regex": "^\\s*(\\S[^:]*).(\\d+):(\\d+)"
