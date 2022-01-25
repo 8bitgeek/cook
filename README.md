@@ -32,7 +32,7 @@ cook <switches> [feature]
 --features    | -F   List features
 --examine     | -x   Examine build steps (requires 'remake')
 --environment | -e   List environment variables
---serials     | -S   List serial numbers (export HLA_SERIAL=) 
+--serials     | -S   List serial numbers (export COOK_SERIAL=) 
 --verbose     | -v   Verbose Output
 --threads     | -T   Compiler Threads
 current state:
