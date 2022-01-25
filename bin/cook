@@ -1,5 +1,37 @@
 #!/bin/bash
-COOK_VERSION="2.0"
+# /*****************************************************************************
+# *          ___  _     _ _                  _                 _               *
+# *         / _ \| |   (_) |                | |               | |              *
+# *        | (_) | |__  _| |_ __ _  ___  ___| | __  _ __   ___| |_             *
+# *         > _ <| '_ \| | __/ _` |/ _ \/ _ \ |/ / | '_ \ / _ \ __|            *
+# *        | (_) | |_) | | || (_| |  __/  __/   < _| | | |  __/ |_             *
+# *         \___/|_.__/|_|\__\__, |\___|\___|_|\_(_)_| |_|\___|\__|            *
+# *                           __/ |                                            *
+# *                          |___/                                             *
+# *                                                                            *
+# *****************************************************************************/
+# /****************************************************************************
+#  * Copyright (c) 2020 Mike Sharkey <mike@8bitgeek.net>
+#  *
+#  * Permission is hereby granted, free of charge, to any person obtaining a 
+#  * copy of this software and associated documentation files (the "Software"),
+#  * to deal in the Software without restriction, including without limitation
+#  * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+#  * and/or sell copies of the Software, and to permit persons to whom the 
+#  * Software is furnished to do so, subject to the following conditions:
+#  *
+#  * The above copyright notice and this permission notice shall be included in
+#  * all copies or substantial portions of the Software.
+#  * 
+#  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+#  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+#  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+#  * DEALINGS IN THE SOFTWARE.
+#  ****************************************************************************
+COOK_VERSION="2.1"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
@@ -67,10 +99,14 @@ run_restore()
 
 default_thread_count()
 {
-	# threads=`cat /proc/cpuinfo | grep processor  | wc | tr -s ' ' | cut -d ' ' -f 2`
-	threads=`nproc`
-	if [ "$threads" = "" -o "$thread" = "0" ]; then
-		threads="4"
+	threads=1
+	if [ "$COOK_THREADS" != "" ]; then
+		threads=$COOK_THREADS;
+	else
+		threads=`nproc`
+		if [ "$threads" = "" -o "$thread" = "0" ]; then
+			threads="4"
+		fi
 	fi
 	return $threads
 }
@@ -87,13 +123,19 @@ export_project_feature_target()
 	SERIAL_INDEX=0
 	SERIALS=`$COOK_SERIALS_HELPER`
 	for SERIAL in $SERIALS; do
-		ENV_HLA_SERIALS[$SERIAL_INDEX]=$SERIAL
+		ENV_COOK_SERIALS[$SERIAL_INDEX]=$SERIAL
 		SERIAL_INDEX=`expr $SERIAL_INDEX + 1`
 	done
-	export ENV_HLA_SERIALS
-	if [ "$HLA_SERIAL" != "" ]; then
-		export ENV_HLA_SERIAL="hla_serial ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
-		# export ENV_HLA_SERIAL="hla_swd ${ENV_HLA_SERIALS[$HLA_SERIAL]}"
+	export ENV_COOK_SERIALS
+	if [ "$COOK_SERIAL" != "" ]; then
+		if [ "$ENV_OPENOCD_SERIAL_PREFIX" != "" ]; then
+			export ENV_COOK_SERIAL="$ENV_OPENOCD_SERIAL_PREFIX "
+		else 
+			export ENV_COOK_SERIAL="hla_serial "
+		fi;
+		export ENV_COOK_SERIAL=$ENV_COOK_SERIAL" $COOK_SERIAL"
+		#export ENV_COOK_SERIAL="hla_serial ${ENV_COOK_SERIALS[$COOK_SERIAL]}"
+		# export ENV_COOK_SERIAL="hla_swd ${ENV_COOK_SERIALS[$COOK_SERIAL]}"
 	fi
 	if [ "$ENV_OPENOCD_ADAPTER_SPEED" != "" ]; then
 		export OPENOCD_ADAPTER_SPEED="adapter speed $ENV_OPENOCD_ADAPTER_SPEED"
@@ -134,9 +176,9 @@ exec_make()
 		construct_make
 		if [ $? == 0 ]; then
 			if [ "$verbose" = "" ]; then
-				$MAKE_CMD -j$threads -f $MAKE_FEATURE $1 > /dev/null
+				$MAKE_CMD -j$threads -f $MAKE_FEATURE $target > /dev/null
 			else
-				$MAKE_CMD -j$threads -f $MAKE_FEATURE $1
+				$MAKE_CMD -j$threads -f $MAKE_FEATURE $target
 			fi
 			return $?
 		else
@@ -201,10 +243,11 @@ print_features()
 
 print_build_state()
 {
-	echo "    project = "`$COOK_PROJECT_HELPER`
-	echo "    feature = "`$COOK_FEATURE_HELPER`
-	echo "     target = "`$COOK_TARGET_HELPER`
-	echo " build-kind = "`$COOK_BUILD_KIND_HELPER`
+	echo "     project = "`$COOK_PROJECT_HELPER`
+	echo "     feature = "`$COOK_FEATURE_HELPER`
+	echo "      target = "`$COOK_TARGET_HELPER`
+	echo "  build-kind = "`$COOK_BUILD_KIND_HELPER`
+	echo "\$COOK_SERIAL = "$COOK_SERIAL
 }
 
 print_help()
@@ -227,7 +270,7 @@ print_help()
 	echo "--release     | -r   Build for release"
 	echo "--remove             [target] Remove an existing target"
 	echo "--restore            [archive] Restore workstation settings"
-	echo "--serials     | -S   List serial numbers (export HLA_SERIAL=$HLA_SERIAL) "
+	echo "--serials     | -S   List serial numbers (export COOK_SERIAL=$COOK_SERIAL) "
 	echo "--state       | -s   Produce listing of current state"
 	echo "--targets     | -G   List all targets"
 	echo "--target      | -t   [target]"
@@ -303,9 +346,10 @@ exec_command_line()
 
 			"--serials" | "-S")
 				SERIAL_INDEX=0
+				export TARGET=`$COOK_TARGET_HELPER`
 				SERIALS=`$COOK_SERIALS_HELPER`
 				for SERIAL in $SERIALS; do
-					echo "<"$SERIAL_INDEX"> "$SERIAL
+					echo $SERIAL
 					SERIAL_INDEX=`expr $SERIAL_INDEX + 1`
 				done
 				exit 0;

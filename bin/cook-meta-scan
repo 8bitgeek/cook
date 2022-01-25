@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+# /*****************************************************************************
+# *          ___  _     _ _                  _                 _               *
+# *         / _ \| |   (_) |                | |               | |              *
+# *        | (_) | |__  _| |_ __ _  ___  ___| | __  _ __   ___| |_             *
+# *         > _ <| '_ \| | __/ _` |/ _ \/ _ \ |/ / | '_ \ / _ \ __|            *
+# *        | (_) | |_) | | || (_| |  __/  __/   < _| | | |  __/ |_             *
+# *         \___/|_.__/|_|\__\__, |\___|\___|_|\_(_)_| |_|\___|\__|            *
+# *                           __/ |                                            *
+# *                          |___/                                             *
+# *                                                                            *
+# *****************************************************************************/
+# /****************************************************************************
+#  * Copyright (c) 2020 Mike Sharkey <mike@8bitgeek.net>
+#  *
+#  * Permission is hereby granted, free of charge, to any person obtaining a 
+#  * copy of this software and associated documentation files (the "Software"),
+#  * to deal in the Software without restriction, including without limitation
+#  * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
+#  * and/or sell copies of the Software, and to permit persons to whom the 
+#  * Software is furnished to do so, subject to the following conditions:
+#  *
+#  * The above copyright notice and this permission notice shall be included in
+#  * all copies or substantial portions of the Software.
+#  * 
+#  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+#  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#  *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+#  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
+#  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+#  * DEALINGS IN THE SOFTWARE.
+#  ****************************************************************************
+import argparse
+import os,codecs
+import math,time
+import json
+
+def extract_cooked_meta( raw_meta ):
+    cooked_meta = raw_meta[4:-2]
+    return cooked_meta.strip()
+
+def extract_raw_meta( fn ):
+    raw_meta=[]
+    # @FIXME handle file open failure exception gracefully
+    with codecs.open(fn, 'r', encoding='utf-8', errors='ignore') as fo:
+        not_eof = True
+        while not_eof:
+            line = fo.readline()
+            if line:
+                line = line.strip()
+                line = line.replace('\t', ' ')
+                if ( line.startswith('/*--') and 
+                        line.endswith('*/') and 
+                        not line.startswith('/*---') ):
+                    raw_meta.append(line)
+            else:
+                not_eof = False
+        fo.close()
+    return raw_meta
+
+def recurse_dir( start_path ):
+    result=[]
+    for (path,dirs,files) in os.walk(start_path):
+        for file in files:
+            if ( file.endswith('.c') or
+                 file.endswith('.h') or
+                 file.endswith('.cpp') ):
+                result.append(path+'/'+file)
+    return result
+
+parser = argparse.ArgumentParser(description='Scan dirs for meta and generate cache output.')
+parser.add_argument('--dir', nargs='*', help='directories to scan')
+
+file_count=0
+json_text=''
+args = parser.parse_args()
+if ( args.dir != None ):
+    json_text+='{"cache":[\n'
+    for dir in range(len(args.dir)): 
+        dir_name=args.dir[dir]
+        source_files = recurse_dir(dir_name)
+        for fileno in range(len(source_files)):
+            fn=source_files[fileno]
+            if ( file_count ):
+                json_snippet=' ,\n '
+            else:
+                json_snippet=' '
+            json_snippet+='{\n  "fn":"'+fn+'"'
+            raw_meta = extract_raw_meta(source_files[fileno])
+            if ( len(raw_meta) > 0 ):
+                json_snippet+=',\n  "meta":['
+                for metano in range(len(raw_meta)):
+                    raw_meta_str = raw_meta[metano]
+                    json_snippet+='  "'+extract_cooked_meta( raw_meta_str )+'"'
+                    if ( metano < len(raw_meta)-1 ):
+                        json_snippet+=','
+                json_snippet+=']\n'
+            json_snippet+=' }'
+            json_text+=(json_snippet+'\n')
+            file_count+=1
+    json_text+=']}\n'
+    try:
+        print(json.dumps(json.loads(json_text), sort_keys=False, indent=4))
+    except json.JSONDecodeError as err:
+        lines = json_text.split('\n')
+        print(lines[err.lineno-1])
+        print((err.colno-1)*' '+'^')
+        print((err.colno-1)*' '+err.msg)

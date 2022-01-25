@@ -6,6 +6,10 @@
 * 'cook' depends upon bash, make, remake, gcc, gdb, openocd
 
 # INSTALLATION
+```
+git submodule init
+git submodule update
+```
 
 * Include cook/bin folder in you PATH environment variable.
 * Copy the contents of cook/settings/home_dot_cook to $HOME/.cook and edit as required.
@@ -28,7 +32,7 @@ cook <switches> [feature]
 --features    | -F   List features
 --examine     | -x   Examine build steps (requires 'remake')
 --environment | -e   List environment variables
---serials     | -S   List serial numbers (export HLA_SERIAL=) 
+--serials     | -S   List serial numbers (export COOK_SERIAL=) 
 --verbose     | -v   Verbose Output
 --threads     | -T   Compiler Threads
 current state:
@@ -64,7 +68,8 @@ Placement for custom shell scrips and executables.
 
 ## feature
 
-Placement for top-level features.
+Placement for top-level features. Features are stand-alone executables.
+Features must have a main() function.
 
 ## _feature/_common
 
@@ -129,3 +134,15 @@ Top level makefile.
 
 MAKE_FEATURE=$MAKE_PATH/$FEATURE_MK
 
+
+# SUBLIME TEXT BUILD 
+
+```
+cook.sublime-build:
+
+{
+  "shell_cmd": "cook",
+  "file_regex": "^\\s*(\\S[^:]*).(\\d+):(\\d+)"
+}
+
+```

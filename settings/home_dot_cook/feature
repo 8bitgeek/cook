@@ -1,1 +1,1 @@
-FEATURE=blinky
+FEATURE=modbus/rtu/slave
