@@ -1,0 +1,10 @@
+ENV_OPENOCD_SERIAL_PREFIX=ftdi_serial
+ENV_OPENOCD_INTERFACE=ftdi/um232h
+ENV_OPENOCD_TARGET=gd32vf103
+ENV_OPENOCD_ADAPTER_SPEED=1000
+ENV_GCC_ROOT=/opt/riscv/bin
+ENV_GCC_PREFIX=$(ENV_GCC_ROOT)/riscv32-unknown-elf-
+ENV_GCC_LIB=/../lib/gcc/riscv32-unknown-elf/11.1.0
+ENV_LIB_GCC=$(ENV_GCC_ROOT)$(ENV_GCC_LIB)/libgcc.a
+ENV_LIB_M=$(ENV_GCC_ROOT)/../riscv32-unknown-elf/lib/libm.a
+ENV_LIB_GPP=$(ENV_GCC_ROOT)/../riscv32-unknown-elf/lib/libstdc++.a
