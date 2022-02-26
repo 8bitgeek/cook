@@ -276,7 +276,7 @@ print_help()
 	echo "--state       | -s   Produce listing of current state"
 	echo "--targets     | -G   List all targets"
 	echo "--target      | -t   [target]"
-	echo "--test        | -E   Build for testing and launch gdb-py"
+	echo "--test        | -E   [test] Build for testing and launch gdb-py"
 	echo "--threads     | -T   [count] Compiler Threads"
 	echo "--verbose     | -v   Verbose Output"
 	echo "--version     | -V   Display version information"
