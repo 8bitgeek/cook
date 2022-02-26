@@ -38,7 +38,7 @@ BUILD_KIND=$1
 
 if [ "$BUILD_KIND" != "" ]; then
 	
-	if [ "$BUILD_KIND" == "debug" -o "$BUILD_KIND" == "release" ]; then
+	if [ "$BUILD_KIND" == "debug" -o "$BUILD_KIND" == "release" -o "$BUILD_KIND" == "test" ]; then
 		if [ ! -d "$COOK_SETTINGS_DIR" ]; then
 			mkdir $COOK_SETTINGS_DIR
 		fi
