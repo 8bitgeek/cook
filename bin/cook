@@ -31,7 +31,7 @@
 #  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 #  * DEALINGS IN THE SOFTWARE.
 #  ****************************************************************************
-COOK_VERSION="2.1"
+COOK_VERSION="3.0"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
@@ -166,19 +166,21 @@ construct_make()
 
 exec_make()
 {
-	target=$1
-	verbose=$2
-	threads=$3
+	arg_target=$1
+	arg_verbose=$2
+	arg_threads=$3
+	arg_test=$4
 
-	if [ "$target" != "$NOP" ]; then
+	if [ "$arg_target" != "$NOP" ]; then
 		export_project_feature_target
 		export_build_kind
 		construct_make
 		if [ $? == 0 ]; then
-			if [ "$verbose" = "" ]; then
-				$MAKE_CMD -j$threads -f $MAKE_FEATURE $target > /dev/null
+			export COOK_TEST="$arg_test"
+			if [ "$arg_verbose" = "" ]; then
+				$MAKE_CMD -j$arg_threads -f $MAKE_FEATURE $arg_target > /dev/null
 			else
-				$MAKE_CMD -j$threads -f $MAKE_FEATURE $target
+				$MAKE_CMD -j$arg_threads -f $MAKE_FEATURE $arg_target
 			fi
 			return $?
 		else
@@ -274,6 +276,7 @@ print_help()
 	echo "--state       | -s   Produce listing of current state"
 	echo "--targets     | -G   List all targets"
 	echo "--target      | -t   [target]"
+	echo "--test        | -E   [test] Build for testing and launch gdb-py"
 	echo "--threads     | -T   [count] Compiler Threads"
 	echo "--verbose     | -v   Verbose Output"
 	echo "--version     | -V   Display version information"
@@ -287,6 +290,7 @@ exec_command_line()
 	next_is_clone=0
 	next_is_remove=0
 	next_is_restore=0
+	next_is_test=0
 	arg_exec_make=1
 	arg_build_kind=""
 	arg_clean=$NOP
@@ -300,6 +304,7 @@ exec_command_line()
 	arg_clone=""
 	arg_remove=""
 	arg_restore=""
+	arg_test=""
 
 	default_thread_count
 	arg_threads=$?
@@ -374,22 +379,32 @@ exec_command_line()
 				arg_build_kind="debug"
 				# HACK to clean then changing build kind
 				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-					exec_make "clean" "$arg_verbose" "$arg_threads"
+					exec_make "clean" "$arg_verbose" "$arg_threads" ""
 				fi
 				arg_verbose="verbose"
+			;;
+
+			"--test" | "-E")
+				arg_build_kind="test"
+				# HACK to clean then changing build kind
+				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+					exec_make "clean" "$arg_verbose" "$arg_threads" ""
+				fi
+				arg_verbose="verbose"
+				next_is_test=1
 			;;
 
 			"--release" | "-r")
 				arg_build_kind="release"
 				# HACK to clean then changing build kind
 				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-					exec_make "clean" "$arg_verbose" "$arg_threads"
+					exec_make "clean" "$arg_verbose" "$arg_threads" ""
 				fi
 			;;
 
 			"--rebuild" | "-R")
 				# HACK to clean then build
-				exec_make "clean" "$arg_verbose" "$arg_threads"
+				exec_make "clean" "$arg_verbose" "$arg_threads" ""
 			;;
 
 			"--kill" | "-k")
@@ -429,7 +444,10 @@ exec_command_line()
 			;;
 
 			*)
-				if [ $next_is_restore == 1 ]; then
+				if [ $next_is_test == 1 ]; then
+					next_is_test=0
+					arg_test=$arg;
+				elif [ $next_is_restore == 1 ]; then
 					next_is_restore=0;
 					arg_restore=$arg;
 					run_restore $arg_restore
@@ -463,13 +481,13 @@ exec_command_line()
 					arg_target=$arg
 					# HACK to force clean when changing target
 					if [ "`$COOK_TARGET_HELPER`" != "$arg_target" ]; then
-						exec_make "clean" "$arg_verbose" "$arg_threads"
+						exec_make "clean" "$arg_verbose" "$arg_threads" "$arg_test"
 					fi
 				elif [ "$arg_feature" == "" ]; then
 					arg_feature=$arg
 					# HACK to clean when changing feature
 					if [ "`$COOK_FEATURE_HELPER`" != "$arg_feature" ]; then
-						exec_make "clean" "$arg_verbose" "$arg_threads"
+						exec_make "clean" "$arg_verbose" "$arg_threads" "$arg_test"
 					fi
 				fi
 			;;
@@ -488,19 +506,21 @@ exec_command_line()
 	set_target 		$arg_target
 	set_feature		$arg_feature
 	set_build_kind 	$arg_build_kind
-	exec_make 		"$arg_clean" "$arg_verbose" "$arg_threads"
+	exec_make 		"$arg_clean" "$arg_verbose" "$arg_threads" "$arg_test"
 	if [ "$arg_build_kind" == "debug" ]; then
-		exec_make "debug" "$arg_verbose" "$arg_threads"
+		exec_make "debug" "$arg_verbose" "$arg_threads" "$arg_test"
+	elif [ "$arg_build_kind" == "test" ]; then
+		exec_make "test" "$arg_verbose" "$arg_threads" "$arg_test"
 	elif [ "$arg_build_kind" == "openocd" ]; then
-		exec_make "openocd" "$arg_verbose" "$arg_threads"
+		exec_make "openocd" "$arg_verbose" "$arg_threads" "$arg_test"
 	else
 		if [ "$arg_clean" == $NOP ]; then
-			exec_make "" "$arg_verbose" "$arg_threads"
+			exec_make "" "$arg_verbose" "$arg_threads" "$arg_test"
 		elif [ "$arg_build_kind" != "" ]; then
-			exec_make "" "$arg_verbose" "$arg_threads"
+			exec_make "" "$arg_verbose" "$arg_threads" "$arg_test"
 		fi
 	fi
-	exec_make "$arg_flash" "$arg_verbose" "$arg_threads"
+	exec_make "$arg_flash" "$arg_verbose" "$arg_threads" "$arg_test"
 
 	return $?
 }
