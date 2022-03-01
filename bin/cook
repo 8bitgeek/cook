@@ -395,14 +395,15 @@ exec_command_line()
 			"--release" | "-r")
 				arg_build_kind="release"
 				# HACK to clean then changing build kind
-				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-					exec_make "clean" "$arg_verbose" "$arg_threads" ""
-				fi
+				# if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+				# 	exec_make "clean" "$arg_verbose" "$arg_threads" ""
+				# fi
 			;;
 
 			"--rebuild" | "-R")
 				# HACK to clean then build
-				exec_make "clean" "$arg_verbose" "$arg_threads" ""
+				# exec_make "clean" "$arg_verbose" "$arg_threads" ""
+				$0 --clean 
 			;;
 
 			"--kill" | "-k")
