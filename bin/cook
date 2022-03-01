@@ -31,7 +31,7 @@
 #  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 #  * DEALINGS IN THE SOFTWARE.
 #  ****************************************************************************
-COOK_VERSION="3.1"
+COOK_VERSION="3.2"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
@@ -375,19 +375,19 @@ exec_command_line()
 
 			"--debug" | "-d")
 				arg_build_kind="debug"
-				# HACK to clean then changing build kind
-				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-					exec_make "clean" "$arg_verbose" "$arg_threads" ""
-				fi
+				# # HACK to clean then changing build kind
+				# if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+				# 	exec_make "clean" "$arg_verbose" "$arg_threads" ""
+				# fi
 				arg_verbose="verbose"
 			;;
 
 			"--test" | "-E")
 				arg_build_kind="test"
-				# HACK to clean then changing build kind
-				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-					exec_make "clean" "$arg_verbose" "$arg_threads" ""
-				fi
+				# # HACK to clean then changing build kind
+				# if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+				# 	exec_make "clean" "$arg_verbose" "$arg_threads" ""
+				# fi
 				arg_verbose="verbose"
 				next_is_test=1
 			;;
