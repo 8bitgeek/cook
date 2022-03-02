@@ -31,7 +31,7 @@
 #  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 #  * DEALINGS IN THE SOFTWARE.
 #  ****************************************************************************
-COOK_VERSION="3.2"
+COOK_VERSION="3.3"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
@@ -376,18 +376,18 @@ exec_command_line()
 			"--debug" | "-d")
 				arg_build_kind="debug"
 				# # HACK to clean then changing build kind
-				# if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-				# 	exec_make "clean" "$arg_verbose" "$arg_threads" ""
-				# fi
+				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+					$0 ---clean
+				fi
 				arg_verbose="verbose"
 			;;
 
 			"--test" | "-E")
 				arg_build_kind="test"
 				# # HACK to clean then changing build kind
-				# if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-				# 	exec_make "clean" "$arg_verbose" "$arg_threads" ""
-				# fi
+				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+					$0 --clean
+				fi
 				arg_verbose="verbose"
 				next_is_test=1
 			;;
@@ -395,15 +395,14 @@ exec_command_line()
 			"--release" | "-r")
 				arg_build_kind="release"
 				# HACK to clean then changing build kind
-				# if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
-				# 	exec_make "clean" "$arg_verbose" "$arg_threads" ""
-				# fi
+				if [ "$arg_build_kind" != "`$COOK_BUILD_KIND_HELPER`" ]; then
+					$0 --clean
+				fi
 			;;
 
 			"--rebuild" | "-R")
 				# HACK to clean then build
-				# exec_make "clean" "$arg_verbose" "$arg_threads" ""
-				$0 --clean 
+				$0 --clean
 			;;
 
 			"--kill" | "-k")
@@ -479,15 +478,15 @@ exec_command_line()
 					next_is_target=0
 					arg_target=$arg
 					# HACK to force clean when changing target
-					# if [ "`$COOK_TARGET_HELPER`" != "$arg_target" ]; then
-					# 	exec_make "clean" "$arg_verbose" "$arg_threads" "$arg_test"
-					# fi
+					if [ "`$COOK_TARGET_HELPER`" != "$arg_target" ]; then
+						$0 --clean
+					fi
 				elif [ "$arg_feature" == "" ]; then
 					arg_feature=$arg
-					# # HACK to clean when changing feature
-					# if [ "`$COOK_FEATURE_HELPER`" != "$arg_feature" ]; then
-					# 	exec_make "clean" "$arg_verbose" "$arg_threads" "$arg_test"
-					# fi
+					# HACK to clean when changing feature
+					if [ "`$COOK_FEATURE_HELPER`" != "$arg_feature" ]; then
+						$0 --clean
+					fi
 				fi
 			;;
 		
