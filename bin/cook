@@ -31,7 +31,7 @@
 #  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 #  * DEALINGS IN THE SOFTWARE.
 #  ****************************************************************************
-COOK_VERSION="3.3"
+COOK_VERSION="3.4"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
