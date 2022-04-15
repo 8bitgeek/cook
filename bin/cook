@@ -31,7 +31,7 @@
 #  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 #  * DEALINGS IN THE SOFTWARE.
 #  ****************************************************************************
-COOK_VERSION="3.4"
+COOK_VERSION="3.5"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
@@ -275,6 +275,7 @@ print_help()
 	echo "--targets     | -G   List all targets"
 	echo "--target      | -t   [target]"
 	echo "--test        | -E   [test] Build for testing and launch gdb-py"
+	echo "--tui         | -U   Enable debug -tui mode"
 	echo "--threads     | -T   [count] Compiler Threads"
 	echo "--verbose     | -v   Verbose Output"
 	echo "--version     | -V   Display version information"
@@ -380,6 +381,10 @@ exec_command_line()
 					$0 ---clean
 				fi
 				arg_verbose="verbose"
+			;;
+
+			"--tui" | "-U")
+				export ENV_COOK_TUI="-tui"
 			;;
 
 			"--test" | "-E")
