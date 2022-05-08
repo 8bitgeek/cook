@@ -129,7 +129,8 @@ export_project_feature_target()
 	export ENV_COOK_SERIALS
 	if [ "$COOK_SERIAL" != "" ]; then
 		if [ "$ENV_OPENOCD_SERIAL_PREFIX" != "" ]; then
-			export ENV_COOK_SERIAL="$ENV_OPENOCD_SERIAL_PREFIX "
+			# export ENV_COOK_SERIAL="$ENV_OPENOCD_SERIAL_PREFIX "
+			export ENV_COOK_SERIAL="`echo $ENV_OPENOCD_SERIAL_PREFIX | sed 's/*/ /'` "
 		else 
 			export ENV_COOK_SERIAL="hla_serial "
 		fi;
