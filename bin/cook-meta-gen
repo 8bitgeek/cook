@@ -36,6 +36,17 @@ import os,codecs
 import math,time
 import json
 
+# Input project source file meta text
+# Output makefile .mk snippet such as: 
+# 
+# # sources
+# include ${SRC_ROOT}/delay/_src.mk
+# include ${SRC_ROOT}/led/_src.mk
+# 
+# # source containing main() function
+# SRCS_CC += $(FEATURE_ROOT)/${FEATURE}/main.c
+# 
+
 feature={}
 source={}
 fault='OK'
@@ -83,7 +94,7 @@ def parse_cache( cache_fn ):
     for fileno in range(len(cache["cache"])):
         metadata={}
         metaobj = cache["cache"][fileno]
-        # print(json.dumps(metaobj, sort_keys=False, indent=4))
+        print(json.dumps(metaobj, sort_keys=False, indent=4))
         if ( metaobj.get("meta") ):
             metadata = metaobj["meta"]
         filepath = metaobj["fn"]
