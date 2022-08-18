@@ -10,7 +10,7 @@ Cook attempts to solve this problem by encouraging a modular design and discrete
 
 The second problem that *cook* aims to solve, is that of the the mixed targets. That is, sharing code between multiple targets, and vendors.
 
-* 'cook' is a build system optimized for micro-controller embedded systems.
+* 'cook' is build system optimized for micro-controller firmware projects.
 * 'cook' provides an alternative to the monolithic approach to firmware.
 * 'cook' promotes a feature-based modulular approach to multi-target development.
 * 'cook' depends upon bash, make, remake, gcc, gdb, openocd
@@ -78,33 +78,35 @@ current state:
 # PROJECT DIRECTORY HIRARCHY
 
 - archives
-- bin
-- feature
+- _feature
   - _bsp
   - _common
   - main
 - gdb
-- ld
-- src
+- _ld
+- _src
   - _bsp
+    - _board 
+    - _chip
 
+## ARCHIVES
 
-## archives
+Personal cook settings may be archived using the cook --archive switch, or restored using the cook --restore switch.
 
-Placement for archived project settings using the --archive flag.
+When the the --archive switch is used, the ~/.cook folder is compressed to a file called <hostname>-<username>.tar.gz
 
-## bin
+By convention, the archive folder can be used to place these compressed settings files, such that they may be preserved in 
+the project source code repository, and restored or used as templates at a later time.
 
-Placement for custom shell scrips and executables.
+## _feature
 
-## feature
+Top level features are typically discrete stand-alone wrappers to support a library function unit test.
 
-Placement for top-level features. Features are stand-alone executables.
-Features must have a main() function.
+Typical feature tests contain main.c file which contains a "main(..)" function or "feature_main(...)" function.
 
 ## _feature/_common
 
-Placement for properties common to all features.
+Placement for properties common to all features including build rules and macros.
 
 ## _feature/_common/_bsp.mk
 ## _feature/_common/_feature.mk
@@ -126,11 +128,11 @@ By convention, placement for the "final" feature, or application.
 
 Placement for debugger scripts and settings.
 
-## ld
+## _ld
 
 Placement for linked scripts.
 
-## src
+## _src
 
 Placement for source code dependencies.
 
