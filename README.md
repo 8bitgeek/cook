@@ -1,4 +1,14 @@
-# COOK
+# WHAT IS 'COOK'?
+
+Cook mainly aims to solve several pervasive problems associated with micro-controller firmware projects.
+
+The first problem that *cook* aims to solve, has to do with the monolithic project model.
+
+The monolithic model which is encouraged by vendor IDEs, discourages modular firmware design, and therefore, also discourages discrete unit testing.
+
+Cook attempts to solve this problem by encouraging a modular design and discrete feature unit tests. A feature is a stand-alone "main()" wrapper around a paticular functional unit.
+
+The second problem that *cook* aims to solve, is that of the the mixed targets. That is, sharing code between multiple targets, and vendors.
 
 * 'cook' is a build system optimized for micro-controller embedded systems.
 * 'cook' provides an alternative to the monolithic approach to firmware.
@@ -7,34 +17,55 @@
 
 # INSTALLATION
 ```
+git checkout https://github.com/8bitgeek/cook.git
 git submodule init
 git submodule update
+sudo ./install.sh
 ```
-
-* Include cook/bin folder in you PATH environment variable.
+* Include the cook/bin folder in you PATH environment variable.
 * Copy the contents of cook/settings/home_dot_cook to $HOME/.cook and edit as required.
 
+# SETUP 
+
+FIXME - Add more discription of user settings folder ~/cook.
+
+Personal settings reside in a folder called ~/.cook.
+
+If this folder does not exist, copy the template.
+```
+cp -r settings/home_dot_cook ~/.cook
+```
+
+# USAGE
 ~~~~
 cook --help
 
 cook <switches> [feature]
 
---project     | -p   [project-dir]
---target      | -t   [target]
-
---help        | -?   Produce this help text
---state       | -s   Produce listing of current state
+--archive            Archive workstation settings
 --clean       | -c   Clean current project/target/feature
+--clone              [target] Clone new target from current target
 --debug       | -d   Build for debugging and launch gdb
---release     | -r   Build for release
---rebuild     | -R   Clean and Build
---flash       | -f   Flash the target
---features    | -F   List features
---examine     | -x   Examine build steps (requires 'remake')
 --environment | -e   List environment variables
+--examine     | -x   Examine build steps (requires 'remake')
+--features    | -F   List all features
+--flash       | -f   Flash the target
+--help        | -?   Produce this help text
+--openocd     | -o   Start the OpenOCD server independantly
+--project     | -p   [project-dir]
+--rebuild     | -R   Clean and Build
+--release     | -r   Build for release
+--remove             [target] Remove an existing target
+--restore            [archive] Restore workstation settings
 --serials     | -S   List serial numbers (export COOK_SERIAL=) 
+--state       | -s   Produce listing of current state
+--targets     | -G   List all targets
+--target      | -t   [target]
+--test        | -E   [test] Build for testing and launch gdb-py
+--tui         | -U   Enable debug -tui mode
+--threads     | -T   [count] Compiler Threads
 --verbose     | -v   Verbose Output
---threads     | -T   Compiler Threads
+--version     | -V   Display version information
 current state:
 
     project = /home/mike/Documents/GitLabs/afm-10-src
