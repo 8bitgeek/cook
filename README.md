@@ -1,40 +1,71 @@
-# COOK
+# WHAT IS 'COOK'?
 
-* 'cook' is a build system optimized for micro-controller embedded systems.
+Cook mainly aims to solve several pervasive problems associated with micro-controller firmware projects.
+
+The first problem that *cook* aims to solve, has to do with the monolithic project model.
+
+The monolithic model which is encouraged by vendor IDEs, discourages modular firmware design, and therefore, also discourages discrete unit testing.
+
+Cook attempts to solve this problem by encouraging a modular design and discrete feature unit tests. A feature is a stand-alone "main()" wrapper around a paticular functional unit.
+
+The second problem that *cook* aims to solve, is that of the the mixed targets. That is, sharing code between multiple targets, and vendors.
+
+* 'cook' is build system optimized for micro-controller firmware projects.
 * 'cook' provides an alternative to the monolithic approach to firmware.
 * 'cook' promotes a feature-based modulular approach to multi-target development.
 * 'cook' depends upon bash, make, remake, gcc, gdb, openocd
 
 # INSTALLATION
 ```
+git checkout https://github.com/8bitgeek/cook.git
 git submodule init
 git submodule update
+sudo ./install.sh
 ```
-
-* Include cook/bin folder in you PATH environment variable.
+* Include the cook/bin folder in you PATH environment variable.
 * Copy the contents of cook/settings/home_dot_cook to $HOME/.cook and edit as required.
 
+# SETUP 
+
+FIXME - Add more discription of user settings folder ~/cook.
+
+Personal settings reside in a folder called ~/.cook.
+
+If this folder does not exist, copy the template.
+```
+cp -r settings/home_dot_cook ~/.cook
+```
+
+# USAGE
 ~~~~
 cook --help
 
 cook <switches> [feature]
 
---project     | -p   [project-dir]
---target      | -t   [target]
-
---help        | -?   Produce this help text
---state       | -s   Produce listing of current state
+--archive            Archive workstation settings
 --clean       | -c   Clean current project/target/feature
+--clone              [target] Clone new target from current target
 --debug       | -d   Build for debugging and launch gdb
---release     | -r   Build for release
---rebuild     | -R   Clean and Build
---flash       | -f   Flash the target
---features    | -F   List features
---examine     | -x   Examine build steps (requires 'remake')
 --environment | -e   List environment variables
+--examine     | -x   Examine build steps (requires 'remake')
+--features    | -F   List all features
+--flash       | -f   Flash the target
+--help        | -?   Produce this help text
+--openocd     | -o   Start the OpenOCD server independantly
+--project     | -p   [project-dir]
+--rebuild     | -R   Clean and Build
+--release     | -r   Build for release
+--remove             [target] Remove an existing target
+--restore            [archive] Restore workstation settings
 --serials     | -S   List serial numbers (export COOK_SERIAL=) 
+--state       | -s   Produce listing of current state
+--targets     | -G   List all targets
+--target      | -t   [target]
+--test        | -E   [test] Build for testing and launch gdb-py
+--tui         | -U   Enable debug -tui mode
+--threads     | -T   [count] Compiler Threads
 --verbose     | -v   Verbose Output
---threads     | -T   Compiler Threads
+--version     | -V   Display version information
 current state:
 
     project = /home/mike/Documents/GitLabs/afm-10-src
@@ -47,33 +78,35 @@ current state:
 # PROJECT DIRECTORY HIRARCHY
 
 - archives
-- bin
-- feature
+- _feature
   - _bsp
   - _common
   - main
 - gdb
-- ld
-- src
+- _ld
+- _src
   - _bsp
+    - _board 
+    - _chip
 
+## ARCHIVES
 
-## archives
+Personal cook settings may be archived using the cook --archive switch, or restored using the cook --restore switch.
 
-Placement for archived project settings using the --archive flag.
+When the the --archive switch is used, the ~/.cook folder is compressed to a file called <hostname>-<username>.tar.gz
 
-## bin
+By convention, the archive folder can be used to place these compressed settings files, such that they may be preserved in 
+the project source code repository, and restored or used as templates at a later time.
 
-Placement for custom shell scrips and executables.
+## _feature
 
-## feature
+Top level features are typically discrete stand-alone wrappers to support a library function unit test.
 
-Placement for top-level features. Features are stand-alone executables.
-Features must have a main() function.
+Typical feature tests contain main.c file which contains a "main(..)" function or "feature_main(...)" function.
 
 ## _feature/_common
 
-Placement for properties common to all features.
+Placement for properties common to all features including build rules and macros.
 
 ## _feature/_common/_bsp.mk
 ## _feature/_common/_feature.mk
@@ -95,11 +128,11 @@ By convention, placement for the "final" feature, or application.
 
 Placement for debugger scripts and settings.
 
-## ld
+## _ld
 
 Placement for linked scripts.
 
-## src
+## _src
 
 Placement for source code dependencies.
 
