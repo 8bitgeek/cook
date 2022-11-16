@@ -31,7 +31,7 @@
 #  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 #  * DEALINGS IN THE SOFTWARE.
 #  ****************************************************************************
-COOK_VERSION="3.5"
+COOK_VERSION="3.6"
 
 NOP="//NOP//"
 FEATURE_MK="_feature.mk"
@@ -113,11 +113,17 @@ default_thread_count()
 
 export_project_feature_target()
 {
+	local EXPORT=""
 	export TARGET=`$COOK_TARGET_HELPER`
 
 	EXPORTS=`$COOK_ENVIRONMENT_HELPER`
 	for EXPORT in $EXPORTS; do
-		export $EXPORT
+		while [ "`echo ${EXPORT} | grep \*`" != "" ]; do
+			EXPORT="`echo ${EXPORT} | sed 's/*/ /'` "
+		done
+		local VAR=`echo ${EXPORT} | cut -f1 "-d="`
+		local VAL=`echo ${EXPORT} | cut -f2 "-d="`
+		export $VAR="$VAL"
 	done
 
 	SERIAL_INDEX=0
@@ -129,8 +135,7 @@ export_project_feature_target()
 	export ENV_COOK_SERIALS
 	if [ "$COOK_SERIAL" != "" ]; then
 		if [ "$ENV_OPENOCD_SERIAL_PREFIX" != "" ]; then
-			# export ENV_COOK_SERIAL="$ENV_OPENOCD_SERIAL_PREFIX "
-			export ENV_COOK_SERIAL="`echo $ENV_OPENOCD_SERIAL_PREFIX | sed 's/*/ /'` "
+			export ENV_COOK_SERIAL="$ENV_OPENOCD_SERIAL_PREFIX "
 		else 
 			export ENV_COOK_SERIAL="hla_serial "
 		fi;
